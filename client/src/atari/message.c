@@ -23,17 +23,21 @@ char convert_char(char c)
         return c;
 }
 
+void screen_color_reset(void)
+{
+    OS.color0 = _gtia_mkcolor(HUE_GREEN,7); // the QR code, lightest green
+    OS.color1 = _gtia_mkcolor(HUE_GREEN,5);
+    OS.color2 = _gtia_mkcolor(HUE_BLUE,7);
+    OS.color3 = _gtia_mkcolor(HUE_MAGENTA,7);
+    OS.color4 = _gtia_mkcolor(HUE_GREEN,0);  // the background, darkest green
+}
+
 void screen_common(void)
 {
     OS.soundr=0;
     OS.rtclok[0] = OS.rtclok[1] = OS.rtclok[2] = 0; // reset clock
     memcpy((void *)0x0600, font, 1024); // copy font into place
     OS.chbas = 0x06; // and use it
-    OS.color0 = _gtia_mkcolor(HUE_GREEN,7); // the QR code, lightest green
-    OS.color1 = _gtia_mkcolor(HUE_GREEN,5);
-    OS.color2 = _gtia_mkcolor(HUE_BLUE,7);
-    OS.color3 = _gtia_mkcolor(HUE_MAGENTA,7);
-    OS.color4 = _gtia_mkcolor(HUE_GREEN,0);  // the background, darkest green
 }
 
 void fade(void)
@@ -76,6 +80,11 @@ void show_qr_code(void)
     OS.sdlst = (void *)&dlist; // use the waiting display list
 
     while (OS.rtclok[2] < 120); // and wait a bit.
+    OS.color0 = POKEY_READ.random;
+    OS.color1 = POKEY_READ.random;
+    OS.color2 = POKEY_READ.random;
+    OS.color3 = POKEY_READ.random;
+    OS.color4 = POKEY_READ.random;
 }
 
 #define MSG_COLS 20
@@ -88,6 +97,7 @@ void display_message(const char *msg)
 
     fade();
 
+    screen_color_reset();
     screen_common();
 
     OS.sdlst = (void *)&msg_dlist;
